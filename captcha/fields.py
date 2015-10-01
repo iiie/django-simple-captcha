@@ -13,6 +13,7 @@ class BaseCaptchaTextInput(MultiWidget):
     """
     Base class for Captcha widgets
     """
+    challenge_funct = None
     def __init__(self, attrs=None):
         widgets = (
             HiddenInput(attrs),
@@ -35,7 +36,7 @@ class BaseCaptchaTextInput(MultiWidget):
         except NoReverseMatch:
             raise ImproperlyConfigured('Make sure you\'ve included captcha.urls as explained in the INSTALLATION section on http://readthedocs.org/docs/django-simple-captcha/en/latest/usage.html#installation')
 
-        key = CaptchaStore.generate_key()
+        key = CaptchaStore.generate_key(challenge_funct=self.challenge_funct)
 
         # these can be used by format_output and render
         self._value = [key, u('')]
@@ -62,6 +63,7 @@ class CaptchaTextInput(BaseCaptchaTextInput):
         self._args = kwargs
         self._args['output_format'] = self._args.get('output_format') or settings.CAPTCHA_OUTPUT_FORMAT
         self._args['id_prefix'] = self._args.get('id_prefix')
+        self.challenge_funct = kwargs.pop('challenge_funct', None)
 
         for key in ('image', 'hidden_field', 'text_field'):
             if '%%(%s)s' % key not in self._args['output_format']:
@@ -114,7 +116,8 @@ class CaptchaField(MultiValueField):
 
         kwargs['widget'] = kwargs.pop('widget', CaptchaTextInput(
             output_format=kwargs.pop('output_format', None),
-            id_prefix=kwargs.pop('id_prefix', None)
+            id_prefix=kwargs.pop('id_prefix', None),
+            challenge_funct=kwargs.pop('challenge_funct', None)
         ))
 
         super(CaptchaField, self).__init__(fields, *args, **kwargs)

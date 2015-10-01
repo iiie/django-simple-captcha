@@ -56,8 +56,8 @@ class CaptchaStore(models.Model):
     remove_expired = classmethod(remove_expired)
 
     @classmethod
-    def generate_key(cls):
-        challenge, response = captcha_settings.get_challenge()()
+    def generate_key(cls, challenge_funct=None):
+        challenge, response = captcha_settings.get_challenge(challenge_funct=challenge_funct)()
         store = cls.objects.create(challenge=challenge, response=response)
 
         return store.hashkey

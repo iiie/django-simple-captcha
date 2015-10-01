@@ -38,8 +38,8 @@ def _callable_from_string(string_or_callable):
         return getattr(__import__('.'.join(string_or_callable.split('.')[:-1]), {}, {}, ['']), string_or_callable.split('.')[-1])
 
 
-def get_challenge():
-    return _callable_from_string(CAPTCHA_CHALLENGE_FUNCT)
+def get_challenge(challenge_funct=None):
+    return _callable_from_string(challenge_funct or CAPTCHA_CHALLENGE_FUNCT)
 
 
 def noise_functions():
